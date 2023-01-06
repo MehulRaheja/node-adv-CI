@@ -1,0 +1,22 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "for fun",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/MehulRaheja/node.git"
+  },
+  "author": "Mehul Raheja",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MehulRaheja/node/issues"
+  },
+  "homepage": "https://github.com/MehulRaheja/node#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
