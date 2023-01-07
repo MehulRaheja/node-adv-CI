@@ -1,23 +1,6 @@
-process.env.UV_THREADPOOL_SIZE = 1;
-// instead of default 4 threads, now each fork child will have 1 thread
-const cluster = require('cluster');
-
-// console.log(cluster.isMaster);
-//Is the file being executed in master mode?
-if (cluster.isMaster) {
-  // cause index.js to be executed *again* but
-  // in child mode
-  cluster.fork();
-  cluster.fork();
-  cluster.fork();
-  cluster.fork();
-} else {
-  // I'm a child, I'm going to act like a server
-  // and do nothing else
   const express = require('express');
   const crypto = require('crypto');
-  const app = express();
-  // console.log('here');
+const app = express();
 
   // function doWork(duration) {
   //   const start = Date.now();
@@ -38,4 +21,3 @@ if (cluster.isMaster) {
 
 
   app.listen(3000);
-}
