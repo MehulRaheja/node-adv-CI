@@ -46,7 +46,9 @@ module.exports = app => {
 
   // // old code
   app.get('/api/blogs', requireLogin, async (req, res) => {
-    const blogs = await Blog.find({ _user: req.user.id });
+    const blogs = await Blog
+      .find({ _user: req.user.id })
+      .cache(); // .cache() function is chained in query in cache.js, it will allow to use the cache for the particular api
 
     res.send(blogs);
   });

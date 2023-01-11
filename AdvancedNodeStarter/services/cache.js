@@ -9,8 +9,20 @@ client.get = util.promisify(client.get);
 
 const exec = mongoose.Query.prototype.exec; // to keep original function safe
 
+// to create toggle cache, means to use cache only for selected api
+// only use below type of function not arrow function, it will mess with this keyword
+// for this we will assign a cache function to the query, which will help to use cache for a particular api
+mongoose.Query.prototype.cache = function () {
+  this.useCache = true;
+  return this;
+}
+
 // don't use arrow function it will mess with the this keyword pointing object
 mongoose.Query.prototype.exec = async function () {
+  // when .cache() is not called we will access the database right away
+  if (!this.useCache) {
+    return exec.apply(this, arguments);
+  }
   // console.log(this.getQuery());   // to get whole query in JSON format
   // console.log(this.mongooseCollection.name);  // to get the name of collection on which mongoose query has been run
 
