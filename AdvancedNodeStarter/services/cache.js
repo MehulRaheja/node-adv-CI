@@ -5,15 +5,16 @@ const util = require('util');
 const redis = require('redis');
 const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
-client.get = util.promisify(client.get);
+client.hget = util.promisify(client.hget);   // hget command is used to get the value associated with the field in the hash stored at the key
 
 const exec = mongoose.Query.prototype.exec; // to keep original function safe
 
 // to create toggle cache, means to use cache only for selected api
 // only use below type of function not arrow function, it will mess with this keyword
 // for this we will assign a cache function to the query, which will help to use cache for a particular api
-mongoose.Query.prototype.cache = function () {
+mongoose.Query.prototype.cache = function (options = {}) {
   this.useCache = true;
+  this.hashKey = JSON.stringify(options.key || '');  // to apply forced expiration on change of data
   return this;
 }
 
@@ -34,11 +35,11 @@ mongoose.Query.prototype.exec = async function () {
   );
 
   // See if we have a value for 'key' in redis
-  const cacheValue = await client.get(key);
+  const cacheValue = await client.hget(this.hashKey, key);
 
   //  If we do, return that
   if (cacheValue) {
-    // console.log(cacheValue);
+    console.log(cacheValue);
     const doc = JSON.parse(cacheValue);
 
     return Array.isArray(doc)
@@ -56,7 +57,15 @@ mongoose.Query.prototype.exec = async function () {
 
   //result is function not an mongoose/mongodb object
   // we need to convert it into object before storing inside redis
-  client.set(key, JSON.stringify(result));
+  client.hset(this.hashKey, key, JSON.stringify(result), 'EX', 10); // 3rd and 4th argument will expire the cache in 10 seconds
 
   return result;
 }
+
+
+// To forcibly clear cache
+module.exports = {
+  clearHash(hashKey) {
+    client.del(JSON.stringify(hashKey));  // to clear cache related to a particular hash
+  }
+};
