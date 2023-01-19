@@ -15,7 +15,8 @@
   "author": "",
   "jest": {
     "verbose": true,
-    "testURL": "http://localhost/"
+    "testURL": "http://localhost/",
+    "setupTestFrameworkScriptFile": "./tests/setup.js"
   },
   "license": "ISC",
   "dependencies": {
