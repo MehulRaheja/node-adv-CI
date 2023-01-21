@@ -1,30 +1,22 @@
-const puppeteer = require('puppeteer');
-const sessionFactory = require('./factories/sessionFactory');
-const userFactory = require('./factories/userFactory');
+const Page = require('./helpers/page');
 
-let browser, page;
+let page;
 
 // this function will run before each test
 beforeEach(async () => {
-  // to launch chromium browser
-  browser = await puppeteer.launch({
-    headless: false   // headless means browser will open without GUI and here false means, don't start in headless mode
-  });
-  page = await browser.newPage();  // to launch a new tab
+  page = await Page.build();
   await page.goto('localhost:3000');  // opens link 'localhost:3000' and await is used here because we need to execute this code before it execute further code lines
 
 });
 
 // this function will run after each test
 afterEach(async () => {
-  await browser.close();
+  // actually it is a browser function
+  await page.close(); // out coustom page class also have browser function so page can also close the browser
 });
 
 test('The header has the correct text', async () => {
-  const text = await page.$eval('a.brand-logo', el => el.innerHTML);  // it will select an element from current page
-  // which is an anchor tag '<a>' with class 'brand-logo' and returns the html text inside the element
-  // puppeteer will serialize function (el => el.innerHTML) into a text then sends to chromium instance.
-  // then that text serialize back to function and get executed and we get the string out of it.
+  const text = await page.getContentOf('a.brand-logo');
 
   expect(text).toEqual('Blogster');
 });
@@ -41,14 +33,8 @@ test('clicking login starts oauth flow', async () => {
 // test.only to run only one test selected test
 test('When signed in, shows logout button', async () => {
 
-  const user = await userFactory();
-  const { session, sig } = sessionFactory(user);
+  await page.login(); // call the login function inside page class newly created with Proxy
 
-  await page.setCookie({ name: 'session', value: session }); // create cookie for session
-  await page.setCookie({ name: 'session.sig', value: sig }); // create cookie for session signature
-  await page.goto('localhost:3000'); // refreshed page to re-render page to see changes after login
-  await page.waitFor('a[href="/auth/logout"]'); // test will wait for this element to appear then resume further execution
-
-  const text = await page.$eval('a[href="/auth/logout"]', el => el.innerHTML); // use different kind of quotes here
+  const text = await page.$eval("a[href='/auth/logout']", el => el.innerHTML); // use different kind of quotes here
   expect(text).toEqual('Logout');
 });
