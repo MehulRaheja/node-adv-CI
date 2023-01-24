@@ -31,7 +31,7 @@ class CustomPage {
     await this.page.setCookie({ name: 'session', value: session }); // create cookie for session
     await this.page.setCookie({ name: 'session.sig', value: sig }); // create cookie for session signature
     await this.page.goto('localhost:3000/blogs'); // refreshed page to re-render page to see changes after login
-    await this.page.waitFor('a[href="/auth/logout"]'); // test will wait for this element to appear then resume further execution
+    await this.page.waitFor("a[href='/auth/logout']"); // test will wait for this element to appear then resume further execution
 
   }
 
@@ -50,6 +50,42 @@ class CustomPage {
     // which is an anchor tag '<a>' with class 'brand-logo' and returns the html text inside the element
     // puppeteer will serialize function (el => el.innerHTML) into a text then sends to chromium instance.
     // then that text serialize back to function and get executed and we get the string out of it.
+  }
+
+  get(path) {
+    return this.page.evaluate((_path) => {
+      return fetch(_path, {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(res => res.json());
+    }, path);
+  }
+  // evaluate func. takes ...args as arguments for the function, we cannot directly arguments to the function as it converts function into string before sending it to chromium
+
+  post(path, data) {
+    return this.page.evaluate(async (_path, _data) => {
+      return fetch(_path, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(_data)
+      }).then(res => res.json());
+      // convert response into json
+    }, path, data);
+  }
+
+  execRequests(actions) {
+    // .map will return array of promises and Promise.all will wait for all the promises to resolve  and return them as a single promise
+    return Promise.all(
+      actions.map(({ method, path, data }) => {
+        return this[method](path, data);
+      })
+    );
   }
 }
 

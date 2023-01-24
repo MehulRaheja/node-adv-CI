@@ -35,6 +35,6 @@ test('When signed in, shows logout button', async () => {
 
   await page.login(); // call the login function inside page class newly created with Proxy
 
-  const text = await page.$eval("a[href='/auth/logout']", el => el.innerHTML); // use different kind of quotes here
+  const text = await page.$eval(`a[href="/auth/logout"]`, el => el.innerHTML); // use different kind of quotes here
   expect(text).toEqual('Logout');
 });

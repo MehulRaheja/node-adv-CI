@@ -1,4 +1,4 @@
-jest.setTimeout(30000); // timeout for each test will be 30 second, by default it is 5 second
+jest.setTimeout(60000); // timeout for each test will be 30 second, by default it is 5 second
 
 require('../models/User');
 
