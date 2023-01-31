@@ -28,7 +28,8 @@ app.use(passport.session());
 require('./routes/authRoutes')(app);
 require('./routes/blogRoutes')(app);
 
-if (['production'].includes(process.env.NODE_ENV)) {
+// NODE_ENV includes production or ci then below file serving stuff will work and frontend will be patched with express app
+if (['production', 'ci'].includes(process.env.NODE_ENV)) { 
   app.use(express.static('client/build'));
 
   const path = require('path');

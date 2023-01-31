@@ -6,7 +6,8 @@ class CustomPage {
   static async build() {
   // to launch chromium browser
     const browser = await puppeteer.launch({
-      headless: false
+      headless: true,
+      args: ['--no-sandbox']   // this option will dramatically decrease our time for running the test
     });
 
     const page = await browser.newPage(); // to launch a new tab
@@ -30,7 +31,7 @@ class CustomPage {
 
     await this.page.setCookie({ name: 'session', value: session }); // create cookie for session
     await this.page.setCookie({ name: 'session.sig', value: sig }); // create cookie for session signature
-    await this.page.goto('localhost:3000/blogs'); // refreshed page to re-render page to see changes after login
+    await this.page.goto('http://localhost:3000/blogs'); // refreshed page to re-render page to see changes after login
     await this.page.waitFor("a[href='/auth/logout']"); // test will wait for this element to appear then resume further execution
 
   }
