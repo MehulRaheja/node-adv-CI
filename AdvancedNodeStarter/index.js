@@ -25,8 +25,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// first parenthesis "()" is require statement which returns a function
+// second parenthesis "(app)" is to immediately invoke the function and passing the app along with the indication
 require('./routes/authRoutes')(app);
 require('./routes/blogRoutes')(app);
+require('./routes/uploadRoutes')(app); 
+
 
 // NODE_ENV includes production or ci then below file serving stuff will work and frontend will be patched with express app
 if (['production', 'ci'].includes(process.env.NODE_ENV)) { 
